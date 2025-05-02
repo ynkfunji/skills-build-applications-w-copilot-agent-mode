@@ -1,3 +1,2 @@
 # Backend requirements for OctoFit Tracker
-Django>=4.1
-psycopg2-binary
+Django==4.1
