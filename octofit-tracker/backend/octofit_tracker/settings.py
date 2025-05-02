@@ -131,3 +131,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Enable CORS and allow all hosts
 CORS_ALLOW_ALL_ORIGINS = True
+
+import os
+import sys
+
+# Add the project directory to the Python path
+sys.path.append(os.path.join(BASE_DIR, "octofit_tracker"))
+
+# Set the default settings module for the 'manage.py' script
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "octofit_tracker.settings")
