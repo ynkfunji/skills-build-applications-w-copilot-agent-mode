@@ -1,25 +1,49 @@
 from django.core.management.base import BaseCommand
-from octofit_tracker.models import User, Team, Activity, Leaderboard, Workout
+from django.contrib.auth.models import User
+from octofit_tracker.models import Workout, Exercise
+import random
+from datetime import timedelta, datetime
 
 class Command(BaseCommand):
-    help = 'Populate the database with test data'
+    help = 'Populates the database with dummy users, workouts, and exercises'
 
     def handle(self, *args, **kwargs):
-        # Create test users
-        user1 = User.objects.create(email='user1@example.com', name='User One', password='password1')
-        user2 = User.objects.create(email='user2@example.com', name='User Two', password='password2')
+        self.stdout.write("Starting database population...")
 
-        # Create test teams
-        team1 = Team.objects.create(name='Team Alpha', members=[user1.id, user2.id])
+        # Optional: Clear existing data
+        Exercise.objects.all().delete()
+        Workout.objects.all().delete()
+        User.objects.exclude(is_superuser=True).delete()
 
-        # Create test activities
-        Activity.objects.create(user=user1, type='Running', duration=30, date='2025-05-01')
-        Activity.objects.create(user=user2, type='Cycling', duration=45, date='2025-05-01')
+        # Create users
+        users = []
+        for i in range(5):
+            user = User.objects.create_user(
+                username=f"user{i}",
+                email=f"user{i}@example.com",
+                password="password123"
+            )
+            users.append(user)
 
-        # Create test leaderboard
-        Leaderboard.objects.create(team=team1, score=100)
+        self.stdout.write("Created 5 users")
 
-        # Create test workouts
-        Workout.objects.create(name='Morning Yoga', description='A relaxing yoga session to start the day.')
+        # Create workouts and exercises
+        workout_types = ['Cardio', 'Strength', 'Yoga', 'HIIT']
+        exercise_names = ['Push-up', 'Squat', 'Burpee', 'Jumping Jack', 'Plank']
 
-        self.stdout.write(self.style.SUCCESS('Successfully populated the database with test data'))
+        for user in users:
+            for _ in range(3):  # 3 workouts per user
+                workout = Workout.objects.create(
+                    user=user,
+                    workout_type=random.choice(workout_types),
+                    date=datetime.now() - timedelta(days=random.randint(0, 30))
+                )
+                # Add exercises to the workout
+                for _ in range(2):  # 2 exercises per workout
+                    Exercise.objects.create(
+                        workout=workout,
+                        name=random.choice(exercise_names),
+                        duration_minutes=random.randint(5, 30)
+                    )
+
+        self.stdout.write(self.style.SUCCESS("Database population complete."))
