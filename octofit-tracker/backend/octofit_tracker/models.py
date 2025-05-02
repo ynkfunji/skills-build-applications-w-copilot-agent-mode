@@ -1,6 +1,8 @@
 from djongo import models
+from django.contrib.auth.models import User
 
-class User(models.Model):
+# Rename the custom User model to avoid conflicts
+class CustomUser(models.Model):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
@@ -20,5 +22,11 @@ class Leaderboard(models.Model):
     score = models.IntegerField()
 
 class Workout(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    workout_type = models.CharField(max_length=50)
+    date = models.DateField()
+
+class Exercise(models.Model):
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    description = models.TextField()
+    duration_minutes = models.IntegerField()

@@ -13,7 +13,11 @@ class Command(BaseCommand):
         # Optional: Clear existing data
         Exercise.objects.all().delete()
         Workout.objects.all().delete()
-        User.objects.exclude(is_superuser=True).delete()
+
+        # Clear existing data without using unsupported SQL operations
+        for user in User.objects.all():
+            if not user.is_superuser:
+                user.delete()
 
         # Create users
         users = []
